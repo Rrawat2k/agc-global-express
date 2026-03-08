@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | AGC Global Express</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:#E63B2E; --navy:#0B1F35; --dark:#07131F; --mid:#1a2e44;
+      --light:#F4F7FA; --white:#fff; --text:#2D3748; --muted:#718096;
+      --border:#E2E8F0; --green:#10B981; --gold:#F59E0B; --blue:#3B82F6;
+      --sidebar-w:240px;
+      --font-d:'Rajdhani',sans-serif; --font-b:'Inter',sans-serif;
+      --r:10px; --sh:0 2px 12px rgba(0,0,0,0.08);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-b);color:var(--text);background:var(--light);display:flex;min-height:100vh}
+
+    /* LOGIN */
+    .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--dark),var(--navy));width:100%;flex-direction:column;gap:2rem}
+    .login-logo{display:flex;align-items:center;gap:.75rem}
+    .login-logo svg{width:48px;height:48px}
+    .login-logo-text{display:flex;flex-direction:column;line-height:1}
+    .login-logo-text .lm{font-family:var(--font-d);font-size:2rem;font-weight:700;color:#fff;letter-spacing:2px}
+    .login-logo-text .ls{font-size:.6rem;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
+    .login-card{background:var(--white);border-radius:16px;padding:2.5rem;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+    .login-card h2{font-family:var(--font-d);font-size:1.5rem;color:var(--navy);margin-bottom:.25rem}
+    .login-card p{color:var(--muted);font-size:.875rem;margin-bottom:2rem}
+    .lf-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.25rem}
+    .lf-group label{font-size:.8rem;font-weight:600;color:var(--text)}
+    .lf-group input{width:100%;padding:.75rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;outline:none;transition:border-color .2s}
+    .lf-group input:focus{border-color:var(--red)}
+    .btn-login{width:100%;padding:.85rem;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:var(--font-d);font-size:1rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:background .2s}
+    .btn-login:hover{background:#C0392B}
+    .login-err{background:#FEE2E2;color:#991B1B;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;display:none}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);background:var(--dark);min-height:100vh;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:50;transition:transform .3s}
+    .sidebar-header{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,.06)}
+    .sidebar-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+    .sidebar-logo svg{width:32px;height:32px}
+    .sidebar-logo-text{display:flex;flex-direction:column;line-height:1}
+    .sidebar-logo-text .sm{font-family:var(--font-d);font-size:1.3rem;font-weight:700;color:#fff;letter-spacing:2px}
+    .sidebar-logo-text .ss{font-size:.5rem;color:var(--red);letter-spacing:2px;text-transform:uppercase}
+    .sidebar-nav{flex:1;padding:1rem 0;overflow-y:auto}
+    .nav-section{padding:.75rem 1rem .25rem;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.25)}
+    .nav-item{display:flex;align-items:center;gap:.75rem;padding:.7rem 1.25rem;color:rgba(255,255,255,.65);text-decoration:none;font-size:.875rem;font-weight:500;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;position:relative}
+    .nav-item:hover,.nav-item.active{color:#fff;background:rgba(255,255,255,.08)}
+    .nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);border-radius:0 2px 2px 0}
+    .nav-item .nav-icon{font-size:1.1rem;width:20px;text-align:center}
+    .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .45rem;border-radius:50px;min-width:18px;text-align:center}
+    .sidebar-footer{padding:1rem;border-top:1px solid rgba(255,255,255,.06)}
+    .user-info{display:flex;align-items:center;gap:.75rem}
+    .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0}
+    .user-details{flex:1;overflow:hidden}
+    .user-details .un{font-size:.85rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .user-details .ur{font-size:.7rem;color:rgba(255,255,255,.4);text-transform:capitalize}
+    .btn-logout{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:.8rem;padding:.25rem;transition:color .2s;margin-top:.25rem}
+    .btn-logout:hover{color:var(--red)}
+
+    /* MAIN */
+    .main-area{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+    .topbar-admin{background:var(--white);border-bottom:1px solid var(--border);padding:.875rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:40;box-shadow:var(--sh)}
+    .topbar-title{font-family:var(--font-d);font-size:1.2rem;font-weight:700;color:var(--navy)}
+    .topbar-actions{display:flex;gap:.75rem;align-items:center}
+    .content-area{flex:1;padding:2rem}
+
+    /* VIEWS */
+    .view{display:none}
+    .view.active{display:block}
+
+    /* DASHBOARD */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-bottom:2rem}
+    .stat-card{background:var(--white);border-radius:var(--r);padding:1.5rem;box-shadow:var(--sh);border:1px solid var(--border);position:relative;overflow:hidden}
+    .stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:currentColor;opacity:.04;border-radius:50%;transform:translate(20px,-20px)}
+    .sc-label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.5rem}
+    .sc-value{font-family:var(--font-d);font-size:2.2rem;font-weight:700;line-height:1}
+    .sc-change{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+    .sc-icon{font-size:2rem;margin-bottom:.75rem}
+    .stat-card.red{color:var(--red)} .stat-card.green{color:var(--green)} .stat-card.blue{color:var(--blue)} .stat-card.gold{color:var(--gold)}
+
+    /* TABLES */
+    .card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--border);overflow:hidden;margin-bottom:1.5rem}
+    .card-header{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+    .card-title{font-family:var(--font-d);font-size:1.1rem;font-weight:700;color:var(--navy)}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{background:var(--light);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:.75rem 1.25rem;text-align:left;white-space:nowrap}
+    td{padding:.875rem 1.25rem;font-size:.875rem;border-bottom:1px solid var(--border);vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(0,0,0,.015)}
+    .badge{display:inline-block;padding:.25rem .75rem;border-radius:50px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .badge-pending{background:#FEF3C7;color:#92400E}
+    .badge-accepted{background:#D1FAE5;color:#065F46}
+    .badge-published{background:#D1FAE5;color:#065F46}
+    .badge-draft{background:#F3F4F6;color:#6B7280}
+    .badge-superadmin{background:#EDE9FE;color:#5B21B6}
+    .badge-agent{background:#DBEAFE;color:#1E40AF}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:6px;font-family:var(--font-d);font-size:.875rem;font-weight:600;letter-spacing:.5px;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+    .btn-primary-sm{background:var(--red);color:#fff} .btn-primary-sm:hover{background:#C0392B}
+    .btn-success{background:var(--green);color:#fff} .btn-success:hover{opacity:.9}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)} .btn-ghost:hover{background:var(--light)}
+    .btn-danger{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA} .btn-danger:hover{background:#DC2626;color:#fff}
+    .btn-icon{width:32px;height:32px;padding:0;justify-content:center;font-size:1rem}
+
+    /* FILTERS */
+    .filters{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1.25rem}
+    .filter-select,.filter-input{padding:.5rem .875rem;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;background:var(--white)}
+    .filter-select:focus,.filter-input:focus{border-color:var(--red)}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--white);border-radius:16px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--white);z-index:1}
+    .modal-header h3{font-family:var(--font-d);font-size:1.2rem;color:var(--navy)}
+    .modal-close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--muted);line-height:1}
+    .modal-body{padding:1.5rem}
+    .modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end}
+
+    /* FORM */
+    .form-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
+    .form-group label{font-size:.8rem;font-weight:600;color:var(--text)}
+    .form-control{width:100%;padding:.7rem .9rem;border:1.5px solid var(--border);border-radius:8px;font-size:.875rem;outline:none;font-family:var(--font-b);transition:border-color .2s}
+    .form-control:focus{border-color:var(--red)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .form-hint{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+    .char-count{font-size:.72rem;color:var(--muted);text-align:right}
+
+    /* QUERY DETAIL */
+    .query-detail{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .qd-item{padding:.75rem;background:var(--light);border-radius:8px}
+    .qd-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.25rem}
+    .qd-value{font-size:.9rem;color:var(--text);font-weight:500}
+
+    /* ALERTS */
+    .alert{padding:.875rem 1.25rem;border-radius:8px;font-size:.875rem;margin-bottom:1rem}
+    .alert-success{background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7}
+    .alert-error{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted)}
+    .empty-state-icon{font-size:3rem;margin-bottom:1rem;opacity:.4}
+    .empty-state h4{font-family:var(--font-d);font-size:1.2rem;color:var(--navy);margin-bottom:.5rem}
+    .empty-state p{font-size:.875rem}
+
+    /* BLOG CONTENT EDITOR */
+    .blog-content-area{min-height:300px;font-family:monospace;font-size:.875rem;resize:vertical}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%)} .sidebar.open{transform:translateX(0)}
+      .main-area{margin-left:0}
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .query-detail{grid-template-columns:1fr}
+      .form-row{grid-template-columns:1fr}
+    }
+
+    /* RATE PREVIEW */
+    .rate-pill{display:inline-block;background:var(--light);border:1px solid var(--border);border-radius:6px;padding:.25rem .6rem;font-size:.8rem;color:var(--navy);font-weight:600}
+    
+    .page-title{font-family:var(--font-d);font-size:1.5rem;font-weight:700;color:var(--navy);margin-bottom:.25rem}
+    .page-desc{font-size:.875rem;color:var(--muted);margin-bottom:1.5rem}
+    .section-divider{height:1px;background:var(--border);margin:1.5rem 0}
+    
+    /* Tooltip on accepted */
+    .accepted-by{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+    
+    /* Blog preview img */
+    .blog-thumb{width:48px;height:48px;border-radius:6px;object-fit:cover;background:var(--navy);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:1.2rem;flex-shrink:0}
+    .blog-thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+    .blog-info{display:flex;align-items:center;gap:.75rem}
+  </style>
+</head>
+<body>
+
+<!-- ─── LOGIN PAGE ─── -->
+<div id="loginPage" style="display:flex;width:100%">
+  <div class="login-page">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none"><path d="M5 20L20 5L35 20L20 35Z" fill="#E63B2E" opacity=".9"/><path d="M12 20L20 12L28 20L20 28Z" fill="#fff"/><circle cx="20" cy="20" r="4" fill="#E63B2E"/></svg>
+      <div class="login-logo-text"><span class="lm">AGC</span><span class="ls">Global Express</span></div>
+    </div>
+    <div class="login-card">
+      <h2>Admin Portal</h2>
+      <p>Sign in to manage queries, rates, and content</p>
+      <div class="login-err" id="loginErr"></div>
+      <div class="lf-group"><label>Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
+      <div class="lf-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ADMIN APP ─── -->
+<div id="adminApp" style="display:none;width:100%">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/" class="sidebar-logo" target="_blank">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M5 20L20 5L35 20L20 35Z" fill="#E63B2E" opacity=".9"/><path d="M12 20L20 12L28 20L20 28Z" fill="#fff"/><circle cx="20" cy="20" r="4" fill="#E63B2E"/></svg>
+        <div class="sidebar-logo-text"><span class="sm">AGC</span><span class="ss">Admin Panel</span></div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <button class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span>Dashboard</button>
+      <button class="nav-item" onclick="showView('queries')" id="nav-queries"><span class="nav-icon">📋</span>Queries<span class="nav-badge" id="pendingBadge" style="display:none">0</span></button>
+
+      <div class="nav-section">Content</div>
+      <button class="nav-item" onclick="showView('blogs')" id="nav-blogs"><span class="nav-icon">✍️</span>Blog Posts</button>
+
+      <div class="nav-section superadmin-only">Settings</div>
+      <button class="nav-item superadmin-only" onclick="showView('rates')" id="nav-rates"><span class="nav-icon">💰</span>Rate Manager</button>
+      <button class="nav-item superadmin-only" onclick="showView('users')" id="nav-users"><span class="nav-icon">👥</span>Users & Agents</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatarSidebar">A</div>
+        <div class="user-details">
+          <div class="un" id="userNameSidebar">Admin</div>
+          <div class="ur" id="userRoleSidebar">superadmin</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">← Logout</button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <main class="main-area">
+    <div class="topbar-admin">
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+      <div class="topbar-actions">
+        <a href="/" target="_blank" class="btn btn-ghost">🌐 View Site</a>
+        <a href="/#contact" target="_blank" class="btn btn-ghost">📩 Query Form</a>
+      </div>
+    </div>
+    <div class="content-area">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-title">Welcome Back, <span id="welcomeName">Admin</span>!</div>
+        <div class="page-desc">Here's an overview of your logistics platform</div>
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card red"><div class="sc-icon">📋</div><div class="sc-label">Total Queries</div><div class="sc-value" id="st-total">—</div></div>
+          <div class="stat-card gold"><div class="sc-icon">⏳</div><div class="sc-label">Pending</div><div class="sc-value" id="st-pending">—</div></div>
+          <div class="stat-card green"><div class="sc-icon">✅</div><div class="sc-label">Accepted</div><div class="sc-value" id="st-accepted">—</div></div>
+          <div class="stat-card blue"><div class="sc-icon">✍️</div><div class="sc-label">Blog Posts</div><div class="sc-value" id="st-blogs">—</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recent Queries</span><button class="btn btn-ghost" onclick="showView('queries')">View All →</button></div>
+          <div class="table-wrap"><table id="recentQueriesTable">
+            <thead><tr><th>Name</th><th>Contact</th><th>Route</th><th>Service</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="recentQueriesBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- QUERIES -->
+      <div class="view" id="view-queries">
+        <div class="page-title">Query Management</div>
+        <div class="page-desc">Review and accept incoming customer enquiries</div>
+        <div class="filters">
+          <select class="filter-select" id="queryStatusFilter" onchange="loadQueries()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+          </select>
+          <input class="filter-input" id="querySearch" placeholder="Search by name, email..." oninput="renderQueriesTable()">
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Customer Queries</span><span class="badge badge-pending" id="queryCountBadge">0 queries</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>#</th><th>Customer</th><th>Route</th><th>Service</th><th>Bags/Weight</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="queriesTableBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- BLOGS -->
+      <div class="view" id="view-blogs">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <div><div class="page-title">Blog Management</div><div class="page-desc">Create and manage SEO-optimized blog articles</div></div>
+          <button class="btn btn-primary-sm" onclick="openBlogModal()">+ New Post</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Post</th><th>Author</th><th>Tags</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="blogsTableBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- RATES -->
+      <div class="view" id="view-rates">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <div><div class="page-title">Rate Manager</div><div class="page-desc">Configure shipping rates by Origin → Destination → Service</div></div>
+          <button class="btn btn-primary-sm" onclick="openRateModal()">+ Add Rate</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Origin</th><th>Destination</th><th>Service</th><th>Per KG (₹)</th><th>Per Bag (₹)</th><th>Min Weight</th><th>Actions</th></tr></thead>
+            <tbody id="ratesTableBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="view" id="view-users">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <div><div class="page-title">User & Agent Management</div><div class="page-desc">Create accounts with specific roles and permissions</div></div>
+          <button class="btn btn-primary-sm" onclick="openUserModal()">+ Add User</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap"><table>
+            <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="usersTableBody"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ─── MODAL: QUERY DETAIL ─── -->
+<div class="modal-overlay" id="queryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Query Details</h3>
+      <button class="modal-close" onclick="closeModal('queryModal')">×</button>
+    </div>
+    <div class="modal-body" id="queryModalBody"></div>
+    <div class="modal-footer" id="queryModalFooter"></div>
+  </div>
+</div>
+
+<!-- ─── MODAL: BLOG ─── -->
+<div class="modal-overlay" id="blogModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="blogModalTitle">New Blog Post</h3>
+      <button class="modal-close" onclick="closeModal('blogModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="blogEditId">
+      <div class="form-group"><label>Title *</label><input class="form-control" id="blogTitle" placeholder="e.g. How to Choose the Right Freight Service" maxlength="100" oninput="updateCharCount('blogTitle','blogTitleCount',100)"><div class="char-count"><span id="blogTitleCount">0</span>/100</div></div>
+      <div class="form-group"><label>Excerpt (for SEO meta description)</label><textarea class="form-control" id="blogExcerpt" rows="2" placeholder="Brief summary (150-160 chars ideal for SEO)" maxlength="200" oninput="updateCharCount('blogExcerpt','blogExcerptCount',200)"></textarea><div class="char-count"><span id="blogExcerptCount">0</span>/200</div></div>
+      <div class="form-group"><label>Content (Markdown supported)</label>
+        <textarea class="form-control blog-content-area" id="blogContent" placeholder="Write your article in Markdown...&#10;&#10;## Heading&#10;**Bold text**&#10;- List items"></textarea>
+        <div class="form-hint">Supports Markdown: ## Heading, **bold**, *italic*, - lists, [link](url)</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Image URL</label><input class="form-control" id="blogImage" placeholder="https://... or leave empty"></div>
+        <div class="form-group"><label>Tags (comma separated)</label><input class="form-control" id="blogTags" placeholder="Air Freight, Tips, Customs"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>SEO Title (override)</label><input class="form-control" id="blogMetaTitle" placeholder="Leave blank to use post title"></div>
+        <div class="form-group"><label>Status</label><select class="form-control" id="blogPublished"><option value="true">Published</option><option value="false">Draft</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('blogModal')">Cancel</button>
+      <button class="btn btn-primary-sm" onclick="saveBlog()">Save Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL: RATE ─── -->
+<div class="modal-overlay" id="rateModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="rateModalTitle">Add Rate</h3>
+      <button class="modal-close" onclick="closeModal('rateModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="rateEditId">
+      <div class="form-row">
+        <div class="form-group"><label>Origin *</label><input class="form-control" id="rateOriginIn" placeholder="e.g. Delhi"></div>
+        <div class="form-group"><label>Destination *</label><input class="form-control" id="rateDestIn" placeholder="e.g. London"></div>
+      </div>
+      <div class="form-group"><label>Service Type *</label>
+        <select class="form-control" id="rateServiceIn">
+          <option>Express</option><option>Standard</option><option>Air Freight</option><option>Sea Freight</option><option>Express Courier</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Rate per KG (₹)</label><input class="form-control" id="ratePerKg" type="number" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>Rate per Bag/Piece (₹)</label><input class="form-control" id="ratePerBag" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="form-group"><label>Minimum Weight (kg)</label><input class="form-control" id="rateMinWeight" type="number" min="0" step="0.1" placeholder="1" value="1"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('rateModal')">Cancel</button>
+      <button class="btn btn-primary-sm" onclick="saveRate()">Save Rate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL: USER ─── -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Create User / Agent</h3>
+      <button class="modal-close" onclick="closeModal('userModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input class="form-control" id="newUserName" placeholder="John Agent"></div>
+        <div class="form-group"><label>Username *</label><input class="form-control" id="newUserUsername" placeholder="johna"></div>
+      </div>
+      <div class="form-group"><label>Email</label><input class="form-control" id="newUserEmail" type="email" placeholder="john@agcglobalexpress.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Password *</label><input class="form-control" id="newUserPassword" type="password" placeholder="Min 8 characters"></div>
+        <div class="form-group"><label>Role</label>
+          <select class="form-control" id="newUserRole">
+            <option value="agent">Agent (view & accept queries)</option>
+            <option value="superadmin">Super Admin (full access)</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert alert-success" id="userRoleInfo" style="display:block">
+        <strong>Role Permissions:</strong><br>
+        • <strong>Agent:</strong> Can view pending queries, accept them (once accepted, hidden from other agents)<br>
+        • <strong>Super Admin:</strong> Full access to all features, users, rates, and blogs
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('userModal')">Cancel</button>
+      <button class="btn btn-primary-sm" onclick="saveUser()">Create User</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let token = localStorage.getItem('agc_token');
+let currentUser = JSON.parse(localStorage.getItem('agc_user') || 'null');
+let allQueries = [];
+
+// ─── AUTH ────────────────────────────────────────────────────────
+function init() {
+  if (token && currentUser) showAdmin();
+}
+
+async function doLogin() {
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    token = data.token; currentUser = data.user;
+    localStorage.setItem('agc_token', token);
+    localStorage.setItem('agc_user', JSON.stringify(currentUser));
+    showAdmin();
+  } catch (e) { err.textContent = e.message; err.style.display = 'block'; }
+  finally { btn.textContent = 'Sign In →'; btn.disabled = false; }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') doLogin();
+});
+
+function doLogout() {
+  localStorage.removeItem('agc_token'); localStorage.removeItem('agc_user');
+  token = null; currentUser = null;
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+function showAdmin() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'flex';
+  document.getElementById('adminApp').style.width = '100%';
+  document.getElementById('userAvatarSidebar').textContent = (currentUser.name || 'A')[0].toUpperCase();
+  document.getElementById('userNameSidebar').textContent = currentUser.name;
+  document.getElementById('userRoleSidebar').textContent = currentUser.role;
+  document.getElementById('welcomeName').textContent = currentUser.name.split(' ')[0];
+
+  // Hide superadmin-only items if agent
+  if (currentUser.role !== 'superadmin') {
+    document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = 'none');
+  }
+  loadDashboard();
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.getElementById('nav-' + v)?.classList.add('active');
+  const titles = {dashboard:'Dashboard', queries:'Queries', blogs:'Blog Posts', rates:'Rate Manager', users:'Users & Agents'};
+  document.getElementById('topbarTitle').textContent = titles[v] || v;
+  if (v === 'queries') loadQueries();
+  else if (v === 'blogs') loadBlogs();
+  else if (v === 'rates') loadRates();
+  else if (v === 'users') loadUsers();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [sRes, qRes] = await Promise.all([
+      authFetch('/api/admin/stats'),
+      authFetch('/api/admin/queries')
+    ]);
+    const stats = await sRes.json();
+    const queries = await qRes.json();
+    document.getElementById('st-total').textContent = stats.totalQueries;
+    document.getElementById('st-pending').textContent = stats.pendingQueries;
+    document.getElementById('st-accepted').textContent = stats.acceptedQueries;
+    document.getElementById('st-blogs').textContent = stats.publishedBlogs;
+    if (stats.pendingQueries > 0) {
+      const badge = document.getElementById('pendingBadge');
+      badge.textContent = stats.pendingQueries; badge.style.display = 'inline-block';
+    }
+    const tbody = document.getElementById('recentQueriesBody');
+    tbody.innerHTML = queries.slice(0, 8).map(q => `
+      <tr>
+        <td><strong>${q.name}</strong><br><small style="color:var(--muted)">${q.company||''}</small></td>
+        <td>${q.email}<br><small>${q.phone||''}</small></td>
+        <td>${q.origin||'—'} → ${q.destination||'—'}</td>
+        <td>${q.service||'—'}</td>
+        <td><span class="badge badge-${q.status}">${q.status}</span></td>
+        <td>${fmtDate(q.createdAt)}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty-state" style="padding:2rem">No queries yet</td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+// ─── QUERIES ──────────────────────────────────────────────────────
+async function loadQueries() {
+  const status = document.getElementById('queryStatusFilter').value;
+  const res = await authFetch(`/api/admin/queries`);
+  allQueries = await res.json();
+  if (status) allQueries = allQueries.filter(q => q.status === status);
+  renderQueriesTable();
+}
+
+function renderQueriesTable() {
+  const search = (document.getElementById('querySearch')?.value || '').toLowerCase();
+  let queries = allQueries.filter(q =>
+    !search || q.name?.toLowerCase().includes(search) || q.email?.toLowerCase().includes(search) || q.company?.toLowerCase().includes(search)
+  );
+  document.getElementById('queryCountBadge').textContent = queries.length + ' queries';
+  const tbody = document.getElementById('queriesTableBody');
+  if (!queries.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">📭</div><h4>No queries found</h4><p>Queries submitted via the website will appear here</p></div></td></tr>'; return; }
+  tbody.innerHTML = queries.map((q, i) => `
+    <tr>
+      <td><small style="color:var(--muted)">#${(q.id||'').slice(0,6).toUpperCase()}</small></td>
+      <td><strong>${q.name}</strong><br><small style="color:var(--muted)">${q.email}</small>${q.company?`<br><small>${q.company}</small>`:''}</td>
+      <td>${q.origin||'—'} → ${q.destination||'—'}</td>
+      <td><span class="rate-pill">${q.service||'—'}</span></td>
+      <td>${q.bags||'—'} bags<br><small>${q.weight||'—'} kg</small></td>
+      <td>
+        <span class="badge badge-${q.status}">${q.status}</span>
+        ${q.status==='accepted'?`<div class="accepted-by">by ${q.acceptedByName||'Admin'}</div>`:''}
+      </td>
+      <td>${fmtDate(q.createdAt)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-icon" onclick="viewQuery('${q.id}')" title="View Details">👁</button>
+        ${q.status==='pending'?`<button class="btn btn-success btn-icon" onclick="acceptQuery('${q.id}')" title="Accept Query">✓</button>`:''}
+        ${currentUser.role==='superadmin'?`<button class="btn btn-danger btn-icon" onclick="deleteQuery('${q.id}')" title="Delete">🗑</button>`:''}
+      </td>
+    </tr>`).join('');
+}
+
+function viewQuery(id) {
+  const q = allQueries.find(x => x.id === id);
+  if (!q) return;
+  document.getElementById('queryModalBody').innerHTML = `
+    <div class="query-detail">
+      <div class="qd-item"><div class="qd-label">Full Name</div><div class="qd-value">${q.name}</div></div>
+      <div class="qd-item"><div class="qd-label">Company</div><div class="qd-value">${q.company||'—'}</div></div>
+      <div class="qd-item"><div class="qd-label">Email</div><div class="qd-value"><a href="mailto:${q.email}">${q.email}</a></div></div>
+      <div class="qd-item"><div class="qd-label">Phone</div><div class="qd-value"><a href="tel:${q.phone}">${q.phone||'—'}</a></div></div>
+      <div class="qd-item"><div class="qd-label">Origin</div><div class="qd-value">${q.origin||'—'}</div></div>
+      <div class="qd-item"><div class="qd-label">Destination</div><div class="qd-value">${q.destination||'—'}</div></div>
+      <div class="qd-item"><div class="qd-label">Service</div><div class="qd-value">${q.service||'—'}</div></div>
+      <div class="qd-item"><div class="qd-label">Bags / Weight</div><div class="qd-value">${q.bags||'—'} bags / ${q.weight||'—'} kg</div></div>
+      <div class="qd-item" style="grid-column:1/-1"><div class="qd-label">Message</div><div class="qd-value" style="white-space:pre-wrap">${q.message||'—'}</div></div>
+      <div class="qd-item"><div class="qd-label">Status</div><div class="qd-value"><span class="badge badge-${q.status}">${q.status}</span></div></div>
+      <div class="qd-item"><div class="qd-label">Submitted</div><div class="qd-value">${new Date(q.createdAt).toLocaleString('en-IN')}</div></div>
+      ${q.status==='accepted'?`<div class="qd-item" style="grid-column:1/-1"><div class="qd-label">Accepted By</div><div class="qd-value">${q.acceptedByName||'Admin'} on ${new Date(q.acceptedAt).toLocaleString('en-IN')}</div></div>`:''}
+    </div>`;
+  const footer = document.getElementById('queryModalFooter');
+  footer.innerHTML = q.status==='pending'
+    ? `<button class="btn btn-ghost" onclick="closeModal('queryModal')">Close</button><button class="btn btn-success" onclick="acceptQuery('${q.id}');closeModal('queryModal')">✓ Accept Query</button>`
+    : `<button class="btn btn-primary-sm" onclick="closeModal('queryModal')">Close</button>`;
+  openModal('queryModal');
+}
+
+async function acceptQuery(id) {
+  try {
+    await authFetch(`/api/admin/queries/${id}/accept`, 'PATCH');
+    loadQueries(); loadDashboard();
+    showToast('Query accepted successfully!', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteQuery(id) {
+  if (!confirm('Delete this query permanently?')) return;
+  await authFetch(`/api/admin/queries/${id}`, 'DELETE');
+  loadQueries(); loadDashboard();
+}
+
+// ─── BLOGS ────────────────────────────────────────────────────────
+async function loadBlogs() {
+  const res = await authFetch('/api/admin/blogs');
+  const blogs = await res.json();
+  const tbody = document.getElementById('blogsTableBody');
+  if (!blogs.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">✍️</div><h4>No blog posts yet</h4><p>Click "+ New Post" to create your first article</p></div></td></tr>'; return; }
+  tbody.innerHTML = blogs.map(b => `<tr>
+    <td>
+      <div class="blog-info">
+        <div class="blog-thumb">${b.image?`<img src="${b.image}" alt="${b.title}">`:'📝'}</div>
+        <div>
+          <strong>${b.title}</strong>
+          <div style="font-size:.75rem;color:var(--muted)">/${b.slug}</div>
+        </div>
+      </div>
+    </td>
+    <td>${b.author}</td>
+    <td><small style="color:var(--muted)">${b.tags||'—'}</small></td>
+    <td><span class="badge badge-${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td>
+    <td>${fmtDate(b.createdAt)}</td>
+    <td style="white-space:nowrap">
+      <a href="/blog.html?slug=${b.slug}" target="_blank" class="btn btn-ghost btn-icon" title="View">👁</a>
+      <button class="btn btn-ghost btn-icon" onclick="editBlog('${b.id}')" title="Edit">✏️</button>
+      <button class="btn btn-danger btn-icon" onclick="deleteBlog('${b.id}')" title="Delete">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openBlogModal(id) {
+  document.getElementById('blogEditId').value = id || '';
+  document.getElementById('blogModalTitle').textContent = id ? 'Edit Blog Post' : 'New Blog Post';
+  if (!id) {
+    ['blogTitle','blogExcerpt','blogContent','blogImage','blogTags','blogMetaTitle'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('blogPublished').value = 'true';
+    ['blogTitleCount','blogExcerptCount'].forEach(id => document.getElementById(id).textContent = '0');
+  }
+  openModal('blogModal');
+}
+
+async function editBlog(id) {
+  const res = await authFetch('/api/admin/blogs');
+  const blogs = await res.json();
+  const b = blogs.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('blogEditId').value = id;
+  document.getElementById('blogModalTitle').textContent = 'Edit Blog Post';
+  document.getElementById('blogTitle').value = b.title || '';
+  document.getElementById('blogExcerpt').value = b.excerpt || '';
+  document.getElementById('blogContent').value = b.content || '';
+  document.getElementById('blogImage').value = b.image || '';
+  document.getElementById('blogTags').value = b.tags || '';
+  document.getElementById('blogMetaTitle').value = b.metaTitle || '';
+  document.getElementById('blogPublished').value = b.published ? 'true' : 'false';
+  updateCharCount('blogTitle','blogTitleCount',100);
+  updateCharCount('blogExcerpt','blogExcerptCount',200);
+  openModal('blogModal');
+}
+
+async function saveBlog() {
+  const id = document.getElementById('blogEditId').value;
+  const data = {
+    title: document.getElementById('blogTitle').value.trim(),
+    excerpt: document.getElementById('blogExcerpt').value.trim(),
+    content: document.getElementById('blogContent').value,
+    image: document.getElementById('blogImage').value.trim(),
+    tags: document.getElementById('blogTags').value.trim(),
+    metaTitle: document.getElementById('blogMetaTitle').value.trim(),
+    published: document.getElementById('blogPublished').value
+  };
+  if (!data.title) return alert('Title is required');
+  if (!data.content) return alert('Content is required');
+  try {
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `/api/admin/blogs/${id}` : '/api/admin/blogs';
+    await authFetch(url, method, data);
+    closeModal('blogModal'); loadBlogs();
+    showToast(`Blog ${id?'updated':'created'} successfully!`, 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteBlog(id) {
+  if (!confirm('Delete this blog post?')) return;
+  await authFetch(`/api/admin/blogs/${id}`, 'DELETE');
+  loadBlogs();
+}
+
+// ─── RATES ────────────────────────────────────────────────────────
+async function loadRates() {
+  const res = await authFetch('/api/admin/rates');
+  const rates = await res.json();
+  const tbody = document.getElementById('ratesTableBody');
+  if (!rates.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">💰</div><h4>No rates configured</h4><p>Add shipping rates to enable the rate calculator</p></div></td></tr>'; return; }
+  tbody.innerHTML = rates.map(r => `<tr>
+    <td>${r.origin}</td><td>${r.destination}</td>
+    <td><span class="rate-pill">${r.service}</span></td>
+    <td>₹${parseFloat(r.perKg).toLocaleString('en-IN')}</td>
+    <td>₹${parseFloat(r.perBag).toLocaleString('en-IN')}</td>
+    <td>${r.minWeight} kg</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-ghost btn-icon" onclick="editRate('${r.id}')" title="Edit">✏️</button>
+      <button class="btn btn-danger btn-icon" onclick="deleteRate('${r.id}')" title="Delete">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+function openRateModal(id) {
+  document.getElementById('rateEditId').value = id || '';
+  document.getElementById('rateModalTitle').textContent = id ? 'Edit Rate' : 'Add Rate';
+  if (!id) { ['rateOriginIn','rateDestIn','ratePerKg','ratePerBag'].forEach(i=>document.getElementById(i).value=''); document.getElementById('rateMinWeight').value='1'; }
+  openModal('rateModal');
+}
+
+async function editRate(id) {
+  const res = await authFetch('/api/admin/rates');
+  const rates = await res.json();
+  const r = rates.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('rateEditId').value = id;
+  document.getElementById('rateModalTitle').textContent = 'Edit Rate';
+  document.getElementById('rateOriginIn').value = r.origin;
+  document.getElementById('rateDestIn').value = r.destination;
+  document.getElementById('rateServiceIn').value = r.service;
+  document.getElementById('ratePerKg').value = r.perKg;
+  document.getElementById('ratePerBag').value = r.perBag;
+  document.getElementById('rateMinWeight').value = r.minWeight;
+  openModal('rateModal');
+}
+
+async function saveRate() {
+  const id = document.getElementById('rateEditId').value;
+  const data = {
+    origin: document.getElementById('rateOriginIn').value.trim(),
+    destination: document.getElementById('rateDestIn').value.trim(),
+    service: document.getElementById('rateServiceIn').value,
+    perKg: parseFloat(document.getElementById('ratePerKg').value)||0,
+    perBag: parseFloat(document.getElementById('ratePerBag').value)||0,
+    minWeight: parseFloat(document.getElementById('rateMinWeight').value)||1
+  };
+  if (!data.origin || !data.destination) return alert('Origin and destination are required');
+  const method = id ? 'PUT' : 'POST';
+  const url = id ? `/api/admin/rates/${id}` : '/api/admin/rates';
+  await authFetch(url, method, data);
+  closeModal('rateModal'); loadRates();
+  showToast('Rate saved!', 'success');
+}
+
+async function deleteRate(id) {
+  if (!confirm('Delete this rate?')) return;
+  await authFetch(`/api/admin/rates/${id}`, 'DELETE');
+  loadRates();
+}
+
+// ─── USERS ────────────────────────────────────────────────────────
+async function loadUsers() {
+  const res = await authFetch('/api/admin/users');
+  const users = await res.json();
+  const tbody = document.getElementById('usersTableBody');
+  tbody.innerHTML = users.map(u => `<tr>
+    <td><strong>${u.name}</strong></td>
+    <td>${u.username}</td>
+    <td>${u.email||'—'}</td>
+    <td><span class="badge badge-${u.role}">${u.role}</span></td>
+    <td>${fmtDate(u.createdAt)}</td>
+    <td>${u.id !== currentUser.id ? `<button class="btn btn-danger btn-icon" onclick="deleteUser('${u.id}')" title="Delete">🗑</button>` : '<small style="color:var(--muted)">You</small>'}</td>
+  </tr>`).join('');
+}
+
+function openUserModal() { openModal('userModal'); ['newUserName','newUserUsername','newUserEmail','newUserPassword'].forEach(i=>document.getElementById(i).value=''); }
+
+async function saveUser() {
+  const data = {
+    name: document.getElementById('newUserName').value.trim(),
+    username: document.getElementById('newUserUsername').value.trim(),
+    email: document.getElementById('newUserEmail').value.trim(),
+    password: document.getElementById('newUserPassword').value,
+    role: document.getElementById('newUserRole').value
+  };
+  if (!data.name || !data.username || !data.password) return alert('Name, username and password are required');
+  if (data.password.length < 6) return alert('Password must be at least 6 characters');
+  try {
+    await authFetch('/api/admin/users', 'POST', data);
+    closeModal('userModal'); loadUsers();
+    showToast('User created successfully!', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user?')) return;
+  await authFetch(`/api/admin/users/${id}`, 'DELETE');
+  loadUsers();
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────
+async function authFetch(url, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (res.status === 401) { doLogout(); throw new Error('Session expired'); }
+  if (!res.ok) { const d = await res.json().catch(()=>({error:'Request failed'})); throw new Error(d.error||'Request failed'); }
+  return res;
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function updateCharCount(inputId, countId, max) {
+  const val = document.getElementById(inputId).value.length;
+  document.getElementById(countId).textContent = val;
+}
+
+let toastTimer;
+function showToast(msg, type) {
+  clearTimeout(toastTimer);
+  let toast = document.getElementById('toastMsg');
+  if (!toast) { toast = document.createElement('div'); toast.id = 'toastMsg'; toast.style.cssText = 'position:fixed;bottom:2rem;right:2rem;padding:.875rem 1.5rem;border-radius:8px;font-size:.875rem;font-weight:600;z-index:9999;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,.2)'; document.body.appendChild(toast); }
+  toast.textContent = msg;
+  toast.style.background = type === 'success' ? '#D1FAE5' : '#FEE2E2';
+  toast.style.color = type === 'success' ? '#065F46' : '#991B1B';
+  toast.style.opacity = '1';
+  toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "060892ff44fdac76",
+    "name": "Test User",
+    "email": "test@test.com",
+    "phone": "9876543210",
+    "service": "Air Freight",
+    "origin": "Delhi",
+    "destination": "London",
+    "bags": 2,
+    "weight": 10,
+    "message": "Test query",
+    "status": "pending",
+    "createdAt": "2026-03-08T15:19:21.947Z"
+  },
+  {
+    "id": "b0080b42e3b466cc",
+    "name": "Rahul Kumar",
+    "email": "rahul@test.com",
+    "phone": "9876543210",
+    "origin": "Delhi",
+    "destination": "London",
+    "service": "Air Freight",
+    "bags": 2,
+    "weight": 10,
+    "message": "Need quote for export",
+    "status": "pending",
+    "createdAt": "2026-03-08T15:24:31.642Z"
+  }
+]

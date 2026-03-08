@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGC Globex – Admin Portal</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080F1C;
+    --sidebar: #0C1527;
+    --card: #101E35;
+    --border: rgba(255,255,255,0.08);
+    --accent: #E8722A;
+    --gold: #F5A623;
+    --sky: #3A9BD5;
+    --green: #22C55E;
+    --red: #EF4444;
+    --yellow: #EAB308;
+    --muted: #6B7FA3;
+    --white: #FFFFFF;
+    --text: #C8D8F0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; }
+  
+  /* LOGIN */
+  #loginScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #080F1C, #0D1F3C);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .login-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 24px; padding: 48px 40px; width: 100%; max-width: 420px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .login-logo {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+    justify-content: center;
+  }
+  .logo-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue'; font-size: 22px;
+  }
+  .login-box h2 { text-align: center; font-size: 28px; margin-bottom: 8px; }
+  .login-box p { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  label { font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+  input, select, textarea {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px; color: var(--white);
+    font-family: 'Outfit'; font-size: 14px; outline: none;
+    transition: border-color 0.3s; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--sky); }
+  select option { background: var(--card); }
+  textarea { resize: vertical; min-height: 80px; }
+  .btn {
+    padding: 12px 24px; border-radius: 8px; border: none;
+    font-family: 'Outfit'; font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: all 0.2s; display: inline-flex;
+    align-items: center; gap: 8px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--gold)); color: white; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,114,42,0.4); }
+  .btn-secondary { background: rgba(255,255,255,0.06); color: var(--white); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+  .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn-success { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .btn-success:hover { background: rgba(34,197,94,0.25); }
+  .btn-sm { padding: 7px 14px; font-size: 12px; }
+  .btn-full { width: 100%; justify-content: center; }
+  .login-error { display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 12px; color: var(--red); font-size: 13px; margin-bottom: 16px; text-align: center; }
+  .login-error.show { display: block; }
+
+  /* LAYOUT */
+  #app { display: none; }
+  #app.show { display: flex; }
+  .sidebar {
+    width: 260px; min-height: 100vh; background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 24px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sidebar-logo span { font-family: 'Bebas Neue'; font-size: 18px; letter-spacing: 2px; }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+  .sidebar-user {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .user-avatar {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--sky), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-weight: 600; font-size: 14px; }
+  .user-role {
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 100px; display: inline-block; margin-top: 2px;
+  }
+  .role-admin { background: rgba(232,114,42,0.2); color: var(--gold); }
+  .role-agent { background: rgba(58,155,213,0.2); color: var(--sky); }
+  nav { padding: 16px 12px; flex: 1; }
+  .nav-section { font-size: 10px; letter-spacing: 2px; color: var(--muted); padding: 0 8px; margin: 16px 0 8px; text-transform: uppercase; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px; cursor: pointer;
+    color: var(--muted); font-size: 14px; font-weight: 500;
+    transition: all 0.2s; margin-bottom: 2px; user-select: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: white; }
+  .nav-item.active { background: rgba(232,114,42,0.1); color: var(--gold); }
+  .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+  .nav-badge {
+    margin-left: auto; background: var(--accent); color: white;
+    font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px;
+  }
+  .sidebar-footer {
+    padding: 16px 12px; border-top: 1px solid var(--border);
+  }
+  .main { margin-left: 260px; flex: 1; padding: 32px; min-height: 100vh; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 32px;
+  }
+  .topbar h1 { font-size: 26px; font-weight: 700; }
+  .topbar p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  /* CARDS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px;
+    transition: border-color 0.3s;
+  }
+  .stat-card:hover { border-color: rgba(232,114,42,0.3); }
+  .stat-label { font-size: 12px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: 'Bebas Neue'; font-size: 40px; line-height: 1; }
+  .stat-change { font-size: 12px; color: var(--green); margin-top: 6px; }
+
+  /* TABLE */
+  .table-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; margin-bottom: 24px;
+  }
+  .table-header {
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .table-header h3 { font-size: 17px; font-weight: 700; }
+  .table-filters { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .filter-input {
+    padding: 8px 14px; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 8px;
+    color: white; font-family: 'Outfit'; font-size: 13px;
+    outline: none; transition: border-color 0.3s;
+  }
+  .filter-input:focus { border-color: var(--sky); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    padding: 12px 20px; text-align: left; font-size: 11px;
+    letter-spacing: 1px; color: var(--muted); text-transform: uppercase;
+    border-bottom: 1px solid var(--border); font-weight: 600;
+  }
+  td {
+    padding: 14px 20px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;
+  }
+  .badge-pending { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .badge-accepted { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-admin { background: rgba(232,114,42,0.15); color: var(--gold); }
+  .badge-agent { background: rgba(58,155,213,0.15); color: var(--sky); }
+  .badge-view { background: rgba(255,255,255,0.08); color: var(--muted); }
+  .badge-full { background: rgba(232,114,42,0.15); color: var(--gold); }
+  .badge-limited { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .btn-row { display: flex; gap: 8px; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px; max-width: 560px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    animation: modalIn 0.3s;
+  }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .modal-header h3 { font-size: 20px; font-weight: 700; }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    color: white; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-row .form-group { margin-bottom: 0; }
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;
+  }
+  .detail-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px; }
+  .detail-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .detail-value { font-size: 14px; font-weight: 600; }
+
+  /* BLOGS */
+  .blog-grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .blog-admin-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+  }
+  .blog-admin-img {
+    height: 140px; background: linear-gradient(135deg, #1E3A5F, #0D1F3C);
+    display: flex; align-items: center; justify-content: center; font-size: 48px;
+    position: relative;
+  }
+  .blog-admin-body { padding: 16px; }
+  .blog-admin-body h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+  .blog-admin-body p { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .blog-admin-footer { display: flex; gap: 8px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 9998;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transform: translateY(100px); opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+    max-width: 340px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .toast-icon { font-size: 20px; }
+  .toast-msg { font-size: 14px; font-weight: 500; }
+
+  /* RIGHTS */
+  .rights-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .right-chip {
+    padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
+    background: rgba(255,255,255,0.04); color: var(--muted);
+  }
+  .right-chip.active { background: rgba(58,155,213,0.15); border-color: rgba(58,155,213,0.4); color: var(--sky); }
+  
+  /* RESPONSIVE */
+  @media(max-width:1024px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+  @media(max-width:768px) {
+    .sidebar { width: 0; overflow: hidden; }
+    .main { margin-left: 0; padding: 16px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h4 { font-size: 18px; margin-bottom: 8px; }
+  .empty-state p { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">AG</div>
+      <div>
+        <span style="font-family:'Bebas Neue';font-size:22px;letter-spacing:2px">AGC GLOBEX</span>
+        <small style="font-size:10px;color:#6B7FA3;letter-spacing:3px;display:block">ADMIN PORTAL</small>
+      </div>
+    </div>
+    <h2>Welcome Back</h2>
+    <p>Sign in to the management dashboard</p>
+    <div class="login-error" id="loginError">Invalid username or password</div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="admin" value="admin">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" value="admin123" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()" style="margin-top:8px">Sign In →</button>
+    <p style="text-align:center;font-size:12px;color:#6B7FA3;margin-top:20px">Default: admin / admin123 &nbsp;|&nbsp; agent@agc / agent123</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">AG</div>
+      <div>
+        <span>AGC GLOBEX</span>
+        <small>ADMIN PORTAL</small>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">AD</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebarName">Admin</div>
+        <div class="user-role role-admin" id="sidebarRole">Admin</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('queries')" id="navQueries">
+        <span class="icon">📬</span> Queries
+        <span class="nav-badge" id="pendingBadge">0</span>
+      </div>
+
+      <div class="nav-section" id="adminSection">Admin Only</div>
+      <div class="nav-item" onclick="showPage('users')" id="navUsers">
+        <span class="icon">👥</span> User Management
+      </div>
+      <div class="nav-item" onclick="showPage('blogs')" id="navBlogs">
+        <span class="icon">📝</span> Blog Manager
+      </div>
+      <div class="nav-item" onclick="showPage('rates')" id="navRates">
+        <span class="icon">💰</span> Rate Settings
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="doLogout()"><span class="icon">🚪</span> Sign Out</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p id="dashDate">Loading...</p>
+        </div>
+        <button class="btn btn-primary" onclick="showPage('queries')">View All Queries</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Queries</div>
+          <div class="stat-value" id="statTotal" style="color:var(--sky)">0</div>
+          <div class="stat-change">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="statPending" style="color:var(--yellow)">0</div>
+          <div class="stat-change">Awaiting action</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Accepted</div>
+          <div class="stat-value" id="statAccepted" style="color:var(--green)">0</div>
+          <div class="stat-change">Processed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Agents</div>
+          <div class="stat-value" id="statAgents" style="color:var(--accent)">0</div>
+          <div class="stat-change">Users</div>
+        </div>
+      </div>
+      <!-- Recent Queries -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Recent Queries</h3>
+          <button class="btn btn-secondary btn-sm" onclick="showPage('queries')">View All</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Query ID</th>
+              <th>Name</th>
+              <th>Service</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recentQueriesBody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No queries yet. <a href="index.html" style="color:var(--sky)">Visit the website</a> to submit one.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- QUERIES -->
+    <div class="page" id="page-queries">
+      <div class="topbar">
+        <div>
+          <h1>Query Management</h1>
+          <p>Review, assign, and process customer queries</p>
+        </div>
+        <div style="display:flex;gap:12px">
+          <select class="filter-input" id="queryStatusFilter" onchange="renderQueries()">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+          </select>
+          <input class="filter-input" type="text" id="querySearch" placeholder="Search name, email..." oninput="renderQueries()">
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3 id="queryCount">All Queries</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Query ID</th>
+              <th>Name / Company</th>
+              <th>Contact</th>
+              <th>Route</th>
+              <th>Service</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="queriesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS (Admin only) -->
+    <div class="page" id="page-users">
+      <div class="topbar">
+        <div>
+          <h1>User Management</h1>
+          <p>Create agents and manage access rights</p>
+        </div>
+        <button class="btn btn-primary" onclick="openUserModal()">+ Create User</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>All Users</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Rights</th>
+              <th>Queries Accepted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BLOGS (Admin only) -->
+    <div class="page" id="page-blogs">
+      <div class="topbar">
+        <div>
+          <h1>Blog Manager</h1>
+          <p>Create and manage SEO-optimized blog posts</p>
+        </div>
+        <button class="btn btn-primary" onclick="openBlogModal()">+ New Blog Post</button>
+      </div>
+      <div class="blog-grid-admin" id="blogAdminGrid"></div>
+    </div>
+
+    <!-- RATES (Admin only) -->
+    <div class="page" id="page-rates">
+      <div class="topbar">
+        <div>
+          <h1>Rate Configuration</h1>
+          <p>Manage freight rate logic: Origin · Destination · Service · Bags · Weight</p>
+        </div>
+        <button class="btn btn-primary" onclick="saveRates()">💾 Save Changes</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <!-- Service Base Rates -->
+        <div class="table-card">
+          <div class="table-header"><h3>Service Base Rates (₹)</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:16px" id="rateFields">
+            <!-- populated by JS -->
+          </div>
+        </div>
+        <!-- Route Multipliers -->
+        <div class="table-card">
+          <div class="table-header"><h3>Destination Multipliers</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:16px" id="destFields">
+            <!-- populated by JS -->
+          </div>
+        </div>
+        <!-- Per KG Rates -->
+        <div class="table-card">
+          <div class="table-header"><h3>Per KG Rates (₹)</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:16px" id="perKgFields">
+            <!-- populated by JS -->
+          </div>
+        </div>
+        <!-- Surcharge Config -->
+        <div class="table-card">
+          <div class="table-header"><h3>Cargo Surcharges</h3></div>
+          <div style="padding:20px">
+            <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Multiplier applied to base freight for special cargo types.</p>
+            <div style="display:flex;flex-direction:column;gap:14px" id="surchargeFields"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<!-- Query Detail Modal -->
+<div class="modal-overlay" id="queryDetailModal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <h3>Query Details</h3>
+      <button class="modal-close" onclick="closeModal('queryDetailModal')">×</button>
+    </div>
+    <div id="queryDetailContent"></div>
+  </div>
+</div>
+
+<!-- Create User Modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="userModalTitle">Create New User</h3>
+      <button class="modal-close" onclick="closeModal('userModal')">×</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Full Name *</label><input type="text" id="uName" placeholder="John Agent"></div>
+      <div class="form-group"><label>Username *</label><input type="text" id="uUsername" placeholder="john.agent"></div>
+    </div>
+    <div class="form-row" style="margin-top:16px">
+      <div class="form-group"><label>Email</label><input type="email" id="uEmail" placeholder="john@agcglobex.com"></div>
+      <div class="form-group"><label>Password *</label><input type="password" id="uPassword" placeholder="min. 8 chars"></div>
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Role</label>
+      <select id="uRole" onchange="toggleRights()">
+        <option value="agent">Agent</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div id="rightsSection" style="margin-top:16px">
+      <label style="font-size:12px;font-weight:600;letter-spacing:1px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:10px">Access Rights</label>
+      <div class="rights-row">
+        <div class="right-chip active" data-right="view_queries" onclick="toggleRight(this)">View Queries</div>
+        <div class="right-chip active" data-right="accept_queries" onclick="toggleRight(this)">Accept Queries</div>
+        <div class="right-chip" data-right="view_all_agents" onclick="toggleRight(this)">View All Agents</div>
+        <div class="right-chip" data-right="manage_blogs" onclick="toggleRight(this)">Manage Blogs</div>
+      </div>
+    </div>
+    <div id="userModalError" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px;color:var(--red);font-size:13px;margin-top:14px"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="saveUser()">Create User →</button>
+  </div>
+</div>
+
+<!-- Blog Modal -->
+<div class="modal-overlay" id="blogModal">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <h3 id="blogModalTitle">New Blog Post</h3>
+      <button class="modal-close" onclick="closeModal('blogModal')">×</button>
+    </div>
+    <div class="form-group"><label>Blog Title *</label><input type="text" id="bTitle" placeholder="e.g. Air Freight Trends 2025"></div>
+    <div class="form-row" style="margin-top:16px">
+      <div class="form-group"><label>Category</label>
+        <select id="bCategory">
+          <option>Industry News</option><option>Customs</option><option>Technology</option>
+          <option>Supply Chain</option><option>Trade Tips</option><option>Company News</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Emoji Icon</label><input type="text" id="bEmoji" placeholder="✈️" maxlength="4" value="📦"></div>
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Excerpt (SEO Meta Description) *</label>
+      <textarea id="bExcerpt" placeholder="Brief description for search engines (150-160 characters)"></textarea>
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Full Content</label>
+      <textarea id="bContent" style="min-height:140px" placeholder="Full blog post content..."></textarea>
+    </div>
+    <div class="form-row" style="margin-top:16px">
+      <div class="form-group"><label>Author Name</label><input type="text" id="bAuthor" placeholder="Your Name"></div>
+      <div class="form-group"><label>Read Time</label><input type="text" id="bReadTime" placeholder="5 min read"></div>
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Image URL (optional)</label>
+      <input type="text" id="bImage" placeholder="https://... (leave blank for emoji)">
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>SEO Keywords</label>
+      <input type="text" id="bKeywords" placeholder="freight, shipping, logistics, ...">
+    </div>
+    <div id="blogModalError" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px;color:var(--red);font-size:13px;margin-top:12px"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="saveBlog()">Publish Post →</button>
+  </div>
+</div>
+
+<!-- Assign Agent Modal -->
+<div class="modal-overlay" id="assignModal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <h3>Assign Query to Agent</h3>
+      <button class="modal-close" onclick="closeModal('assignModal')">×</button>
+    </div>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Select an agent to assign this query to. The agent will see it in their queue.</p>
+    <div class="form-group">
+      <label>Select Agent</label>
+      <select id="assignAgentSelect"></select>
+    </div>
+    <input type="hidden" id="assignQueryId">
+    <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="doAssign()">Assign →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span class="toast-msg" id="toastMsg">Done!</span>
+</div>
+
+<script>
+// ============================================
+// DATA LAYER
+// ============================================
+const DB = {
+  get(k) { try { return JSON.parse(localStorage.getItem('agc_'+k)||'null'); } catch(e){return null;} },
+  set(k,v) { localStorage.setItem('agc_'+k,JSON.stringify(v)); },
+  push(k,v) { const a=this.get(k)||[]; a.push(v); this.set(k,a); return v; }
+};
+
+// ============================================
+// INIT DEFAULTS
+// ============================================
+function initDefaults() {
+  if (!DB.get('users')) {
+    DB.set('users', [
+      { id:'u1', name:'Super Admin', username:'admin', password:'admin123', role:'admin', rights:['all'], email:'admin@agcglobex.com', acceptedCount:0, createdAt:new Date().toISOString() },
+      { id:'u2', name:'Ravi Agent', username:'agent@agc', password:'agent123', role:'agent', rights:['view_queries','accept_queries'], email:'ravi@agcglobex.com', acceptedCount:0, createdAt:new Date().toISOString() }
+    ]);
+  }
+  if (!DB.get('rateConfig')) {
+    DB.set('rateConfig', {
+      services: {
+        air_express:  { base:800,  perKg:280 },
+        air_standard: { base:500,  perKg:180 },
+        sea_fcl:      { base:45000,perKg:15  },
+        sea_lcl:      { base:8000, perKg:25  },
+        courier:      { base:350,  perKg:200 },
+        road:         { base:3000, perKg:45  }
+      },
+      destinations: {
+        DXB:1.0, LHR:1.35, JFK:1.45, FRA:1.3, SIN:1.1,
+        HKG:1.15, SYD:1.4, NRT:1.3, CDG:1.35, LAX:1.5, GRU:1.7, JNB:1.6
+      },
+      surcharges: { hazmat:1.6, perishable:1.4, fragile:1.3 }
+    });
+  }
+}
+
+// ============================================
+// AUTH
+// ============================================
+let currentUser = null;
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  initDefaults();
+  const users = DB.get('users') || [];
+  const found = users.find(x => x.username===u && x.password===p);
+  if (!found) {
+    document.getElementById('loginError').classList.add('show');
+    return;
+  }
+  currentUser = found;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').classList.add('show');
+  setupUI();
+  renderDashboard();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').classList.remove('show');
+}
+
+function setupUI() {
+  document.getElementById('sidebarAvatar').textContent = currentUser.name.slice(0,2).toUpperCase();
+  document.getElementById('sidebarName').textContent = currentUser.name;
+  const roleEl = document.getElementById('sidebarRole');
+  roleEl.textContent = currentUser.role === 'admin' ? 'Administrator' : 'Agent';
+  roleEl.className = 'user-role ' + (currentUser.role==='admin' ? 'role-admin':'role-agent');
+
+  // Admin-only items
+  const isAdmin = currentUser.role === 'admin' || (currentUser.rights||[]).includes('all');
+  ['navUsers','navBlogs','navRates','adminSection'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isAdmin ? '' : 'none';
+  });
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+// ============================================
+// PAGES
+// ============================================
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  event && event.currentTarget && event.currentTarget.classList.add('active');
+  
+  // find and activate correct nav item by re-checking
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active');
+  });
+
+  if(page==='dashboard') renderDashboard();
+  if(page==='queries') renderQueries();
+  if(page==='users') renderUsers();
+  if(page==='blogs') renderBlogsAdmin();
+  if(page==='rates') renderRates();
+}
+
+// ============================================
+// DASHBOARD
+// ============================================
+function renderDashboard() {
+  const queries = DB.get('queries') || [];
+  const users = DB.get('users') || [];
+  const pending = queries.filter(q=>q.status==='pending').length;
+  const accepted = queries.filter(q=>q.status==='accepted').length;
+  
+  document.getElementById('statTotal').textContent = queries.length;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statAccepted').textContent = accepted;
+  document.getElementById('statAgents').textContent = users.filter(u=>u.role==='agent').length;
+  document.getElementById('pendingBadge').textContent = pending;
+
+  const recent = queries.slice(-5).reverse();
+  const tbody = document.getElementById('recentQueriesBody');
+  if(!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No queries yet. <a href="index.html" style="color:var(--sky)">Visit the website</a> to submit one.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = recent.map(q => `
+    <tr>
+      <td><code style="font-size:11px;color:var(--sky)">${q.id}</code></td>
+      <td>${q.name}</td>
+      <td>${q.service||'—'}</td>
+      <td style="font-size:12px;color:var(--muted)">${formatDate(q.submittedAt)}</td>
+      <td><span class="badge badge-${q.status}">${q.status==='pending'?'⏳ Pending':'✅ Accepted'}</span></td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openQueryDetail('${q.id}')">View</button></td>
+    </tr>
+  `).join('');
+}
+
+// ============================================
+// QUERIES
+// ============================================
+function renderQueries() {
+  let queries = DB.get('queries') || [];
+  const statusFilter = document.getElementById('queryStatusFilter')?.value || 'all';
+  const search = (document.getElementById('querySearch')?.value||'').toLowerCase();
+
+  // Agents only see pending + their own accepted
+  if(currentUser.role !== 'admin' && !(currentUser.rights||[]).includes('all')) {
+    queries = queries.filter(q => q.status==='pending' || q.assignedTo===currentUser.id);
+  }
+  if(statusFilter !== 'all') queries = queries.filter(q=>q.status===statusFilter);
+  if(search) queries = queries.filter(q=>(q.name+q.email+q.id).toLowerCase().includes(search));
+
+  document.getElementById('queryCount').textContent = `${queries.length} Quer${queries.length===1?'y':'ies'}`;
+  document.getElementById('pendingBadge').textContent = (DB.get('queries')||[]).filter(q=>q.status==='pending').length;
+
+  const tbody = document.getElementById('queriesBody');
+  if(!queries.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">📭</div><h4>No queries found</h4><p>Queries submitted on the website will appear here.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = queries.reverse().map(q => {
+    const isAdmin = currentUser.role==='admin'||(currentUser.rights||[]).includes('all');
+    const canAccept = isAdmin || (currentUser.rights||[]).includes('accept_queries');
+    return `
+    <tr>
+      <td><code style="font-size:11px;color:var(--sky)">${q.id}</code></td>
+      <td>
+        <div style="font-weight:600">${q.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${q.company||'—'}</div>
+      </td>
+      <td>
+        <div style="font-size:13px">${q.email}</div>
+        <div style="font-size:12px;color:var(--muted)">${q.phone||'—'}</div>
+      </td>
+      <td style="font-size:13px">${q.origin||'—'} → ${q.destination||q.dest||'—'}</td>
+      <td style="font-size:13px">${q.service||'—'}</td>
+      <td style="font-size:12px;color:var(--muted)">${formatDate(q.submittedAt)}</td>
+      <td><span class="badge badge-${q.status}">${q.status==='pending'?'⏳ Pending':'✅ Accepted'}</span></td>
+      <td>
+        <div class="btn-row">
+          <button class="btn btn-secondary btn-sm" onclick="openQueryDetail('${q.id}')">View</button>
+          ${q.status==='pending' && canAccept ? `<button class="btn btn-success btn-sm" onclick="acceptQuery('${q.id}')">Accept</button>` : ''}
+          ${isAdmin && q.status==='pending' ? `<button class="btn btn-secondary btn-sm" onclick="openAssignModal('${q.id}')">Assign</button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `}).join('');
+}
+
+function openQueryDetail(qid) {
+  const queries = DB.get('queries') || [];
+  const q = queries.find(x=>x.id===qid);
+  if(!q) return;
+  const isAdmin = currentUser.role==='admin'||(currentUser.rights||[]).includes('all');
+  const canAccept = isAdmin||(currentUser.rights||[]).includes('accept_queries');
+  document.getElementById('queryDetailContent').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Query ID</div><div class="detail-value" style="color:var(--sky);font-size:12px">${q.id}</div></div>
+      <div class="detail-item"><div class="detail-label">Status</div><div class="detail-value"><span class="badge badge-${q.status}">${q.status==='pending'?'⏳ Pending':'✅ Accepted'}</span></div></div>
+      <div class="detail-item"><div class="detail-label">Name</div><div class="detail-value">${q.name}</div></div>
+      <div class="detail-item"><div class="detail-label">Company</div><div class="detail-value">${q.company||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Email</div><div class="detail-value">${q.email}</div></div>
+      <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value">${q.phone||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Origin</div><div class="detail-value">${q.origin||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Destination</div><div class="detail-value">${q.destination||q.dest||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Service</div><div class="detail-value">${q.service||'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Weight</div><div class="detail-value">${q.weight?q.weight+' kg':'—'}</div></div>
+      <div class="detail-item"><div class="detail-label">Submitted</div><div class="detail-value">${formatDate(q.submittedAt)}</div></div>
+      <div class="detail-item"><div class="detail-label">Accepted By</div><div class="detail-value">${q.acceptedBy||'—'}</div></div>
+    </div>
+    ${q.message?`<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:16px;margin-bottom:20px"><div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">MESSAGE</div><p style="font-size:14px;color:var(--text);line-height:1.7">${q.message}</p></div>`:''}
+    ${q.status==='pending' && canAccept ? `<button class="btn btn-success btn-full" onclick="acceptQuery('${q.id}');closeModal('queryDetailModal')">✅ Accept This Query</button>` : ''}
+    ${q.status==='accepted' ? `<div style="text-align:center;padding:20px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;color:var(--green)">✅ This query has been accepted and processed.</div>` : ''}
+  `;
+  document.getElementById('queryDetailModal').classList.add('open');
+}
+
+function acceptQuery(qid) {
+  const canAccept = currentUser.role==='admin'||(currentUser.rights||[]).includes('all')||(currentUser.rights||[]).includes('accept_queries');
+  if(!canAccept) { showToast('❌','You do not have rights to accept queries.'); return; }
+  
+  const queries = DB.get('queries') || [];
+  const idx = queries.findIndex(q=>q.id===qid);
+  if(idx===-1) return;
+  queries[idx].status = 'accepted';
+  queries[idx].acceptedBy = currentUser.name;
+  queries[idx].acceptedAt = new Date().toISOString();
+  DB.set('queries', queries);
+
+  // Update agent accepted count
+  const users = DB.get('users') || [];
+  const uidx = users.findIndex(u=>u.id===currentUser.id);
+  if(uidx!==-1) { users[uidx].acceptedCount = (users[uidx].acceptedCount||0)+1; DB.set('users',users); }
+
+  showToast('✅','Query accepted successfully!');
+  renderQueries();
+  renderDashboard();
+}
+
+function openAssignModal(qid) {
+  const users = DB.get('users')||[];
+  const agents = users.filter(u=>u.role==='agent');
+  document.getElementById('assignAgentSelect').innerHTML = agents.map(a=>`<option value="${a.id}">${a.name} (${a.username})</option>`).join('');
+  document.getElementById('assignQueryId').value = qid;
+  document.getElementById('assignModal').classList.add('open');
+}
+
+function doAssign() {
+  const qid = document.getElementById('assignQueryId').value;
+  const uid = document.getElementById('assignAgentSelect').value;
+  const queries = DB.get('queries')||[];
+  const users = DB.get('users')||[];
+  const idx = queries.findIndex(q=>q.id===qid);
+  const agent = users.find(u=>u.id===uid);
+  if(idx===-1||!agent) return;
+  queries[idx].assignedTo = uid;
+  queries[idx].assignedToName = agent.name;
+  DB.set('queries',queries);
+  closeModal('assignModal');
+  showToast('📌',`Query assigned to ${agent.name}`);
+  renderQueries();
+}
+
+// ============================================
+// USERS
+// ============================================
+function renderUsers() {
+  const users = DB.get('users')||[];
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--sky),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">${u.name.slice(0,2).toUpperCase()}</div>
+          <div><div style="font-weight:600">${u.name}</div><div style="font-size:12px;color:var(--muted)">${u.email||'—'}</div></div>
+        </div>
+      </td>
+      <td><code style="font-size:13px;color:var(--sky)">${u.username}</code></td>
+      <td><span class="badge badge-${u.role}">${u.role==='admin'?'👑 Admin':'🧑‍💼 Agent'}</span></td>
+      <td>
+        ${u.role==='admin'||(u.rights||[]).includes('all')
+          ? '<span class="badge badge-full">Full Access</span>'
+          : (u.rights||[]).map(r=>`<span style="font-size:11px;background:rgba(58,155,213,0.1);color:var(--sky);padding:3px 8px;border-radius:4px;margin:2px;display:inline-block">${r.replace(/_/g,' ')}</span>`).join('')
+        }
+      </td>
+      <td style="font-family:'Bebas Neue';font-size:22px;color:var(--green)">${u.acceptedCount||0}</td>
+      <td>
+        <div class="btn-row">
+          ${u.id!=='u1'?`<button class="btn btn-secondary btn-sm" onclick="editUser('${u.id}')">Edit</button>`:''}
+          ${u.id!=='u1'?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Delete</button>`:''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+let editingUserId = null;
+function openUserModal(uid) {
+  editingUserId = uid || null;
+  document.getElementById('userModalTitle').textContent = uid ? 'Edit User' : 'Create New User';
+  if(uid) {
+    const u = (DB.get('users')||[]).find(x=>x.id===uid);
+    if(!u) return;
+    document.getElementById('uName').value = u.name;
+    document.getElementById('uUsername').value = u.username;
+    document.getElementById('uEmail').value = u.email||'';
+    document.getElementById('uPassword').value = u.password;
+    document.getElementById('uRole').value = u.role;
+    // Set rights chips
+    document.querySelectorAll('.right-chip').forEach(c => {
+      c.classList.toggle('active', (u.rights||[]).includes(c.dataset.right));
+    });
+  } else {
+    ['uName','uUsername','uEmail','uPassword'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('uRole').value='agent';
+    document.querySelectorAll('.right-chip').forEach((c,i)=>c.classList.toggle('active',i<2));
+  }
+  toggleRights();
+  document.getElementById('userModal').classList.add('open');
+}
+function editUser(uid) { openUserModal(uid); }
+
+function deleteUser(uid) {
+  if(!confirm('Delete this user?')) return;
+  const users = (DB.get('users')||[]).filter(u=>u.id!==uid);
+  DB.set('users',users);
+  renderUsers();
+  showToast('🗑️','User deleted');
+}
+
+function toggleRights() {
+  const isAdmin = document.getElementById('uRole').value==='admin';
+  document.getElementById('rightsSection').style.display = isAdmin ? 'none':'block';
+}
+function toggleRight(chip) { chip.classList.toggle('active'); }
+
+function saveUser() {
+  const name = document.getElementById('uName').value.trim();
+  const username = document.getElementById('uUsername').value.trim();
+  const password = document.getElementById('uPassword').value;
+  const email = document.getElementById('uEmail').value.trim();
+  const role = document.getElementById('uRole').value;
+  const errEl = document.getElementById('userModalError');
+
+  if(!name||!username||!password) { errEl.textContent='Name, username and password required.'; errEl.style.display='block'; return; }
+  if(password.length < 6) { errEl.textContent='Password must be at least 6 characters.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const rights = role==='admin' ? ['all'] : Array.from(document.querySelectorAll('.right-chip.active')).map(c=>c.dataset.right);
+  const users = DB.get('users')||[];
+
+  if(editingUserId) {
+    const idx = users.findIndex(u=>u.id===editingUserId);
+    if(idx!==-1) { users[idx] = {...users[idx], name, username, password, email, role, rights}; }
+  } else {
+    // Check username unique
+    if(users.find(u=>u.username===username)) { errEl.textContent='Username already exists.'; errEl.style.display='block'; return; }
+    users.push({ id:'u'+Date.now(), name, username, password, email, role, rights, acceptedCount:0, createdAt:new Date().toISOString() });
+  }
+  DB.set('users',users);
+  closeModal('userModal');
+  renderUsers();
+  showToast('✅', editingUserId ? 'User updated!' : 'User created!');
+}
+
+// ============================================
+// BLOGS
+// ============================================
+function renderBlogsAdmin() {
+  const blogs = DB.get('blogs')||[];
+  const grid = document.getElementById('blogAdminGrid');
+  if(!blogs.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📝</div><h4>No blog posts yet</h4><p>Create your first SEO-optimized blog post to attract organic traffic.</p></div>`;
+    return;
+  }
+  grid.innerHTML = blogs.map(b=>`
+    <div class="blog-admin-card">
+      <div class="blog-admin-img">${b.image?`<img src="${b.image}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'" />`:b.emoji||'📦'}</div>
+      <div class="blog-admin-body">
+        <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:6px">${b.category}</div>
+        <h4>${b.title}</h4>
+        <p>${b.excerpt?.slice(0,80)}...</p>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${b.author} · ${b.date}</div>
+        <div class="blog-admin-footer">
+          <button class="btn btn-secondary btn-sm" onclick="editBlog('${b.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteBlog('${b.id}')">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let editingBlogId = null;
+function openBlogModal(bid) {
+  editingBlogId = bid||null;
+  document.getElementById('blogModalTitle').textContent = bid ? 'Edit Post':'New Blog Post';
+  if(bid) {
+    const b = (DB.get('blogs')||[]).find(x=>x.id===bid);
+    if(!b) return;
+    ['bTitle','bExcerpt','bContent','bAuthor','bReadTime','bImage','bKeywords'].forEach(id=>{
+      const key = id.replace('b','').toLowerCase();
+      document.getElementById(id).value = b[key]||b[id.slice(1).toLowerCase()]||'';
+    });
+    document.getElementById('bCategory').value = b.category||'Industry News';
+    document.getElementById('bEmoji').value = b.emoji||'📦';
+  } else {
+    ['bTitle','bExcerpt','bContent','bAuthor','bReadTime','bImage','bKeywords'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('bEmoji').value='📦';
+  }
+  document.getElementById('blogModal').classList.add('open');
+}
+function editBlog(bid) { openBlogModal(bid); }
+
+function saveBlog() {
+  const title = document.getElementById('bTitle').value.trim();
+  const excerpt = document.getElementById('bExcerpt').value.trim();
+  const errEl = document.getElementById('blogModalError');
+  if(!title||!excerpt) { errEl.textContent='Title and excerpt are required.'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const blog = {
+    id: editingBlogId || 'blog_'+Date.now(),
+    title, excerpt,
+    content: document.getElementById('bContent').value,
+    category: document.getElementById('bCategory').value,
+    emoji: document.getElementById('bEmoji').value,
+    author: document.getElementById('bAuthor').value || currentUser.name,
+    readTime: document.getElementById('bReadTime').value || '5 min read',
+    image: document.getElementById('bImage').value,
+    keywords: document.getElementById('bKeywords').value,
+    date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}),
+    publishedAt: new Date().toISOString()
+  };
+
+  let blogs = DB.get('blogs')||[];
+  if(editingBlogId) {
+    const idx = blogs.findIndex(b=>b.id===editingBlogId);
+    if(idx!==-1) blogs[idx]=blog;
+  } else {
+    blogs.push(blog);
+  }
+  DB.set('blogs',blogs);
+  closeModal('blogModal');
+  renderBlogsAdmin();
+  showToast('✅', editingBlogId ? 'Post updated!':'Post published!');
+}
+
+function deleteBlog(bid) {
+  if(!confirm('Delete this blog post?')) return;
+  DB.set('blogs',(DB.get('blogs')||[]).filter(b=>b.id!==bid));
+  renderBlogsAdmin();
+  showToast('🗑️','Post deleted');
+}
+
+// ============================================
+// RATES
+// ============================================
+function renderRates() {
+  const cfg = DB.get('rateConfig');
+  const svcLabels = { air_express:'Air Express', air_standard:'Air Standard', sea_fcl:'Sea FCL', sea_lcl:'Sea LCL', courier:'Courier', road:'Road' };
+  
+  document.getElementById('rateFields').innerHTML = Object.entries(cfg.services).map(([k,v])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <label style="font-size:13px;font-weight:600;color:var(--text);min-width:120px">${svcLabels[k]||k}</label>
+      <input type="number" id="rate_base_${k}" value="${v.base}" style="width:120px;padding:8px 12px;font-size:13px">
+    </div>
+  `).join('');
+
+  document.getElementById('perKgFields').innerHTML = Object.entries(cfg.services).map(([k,v])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <label style="font-size:13px;font-weight:600;color:var(--text);min-width:120px">${svcLabels[k]||k}</label>
+      <input type="number" id="rate_pkg_${k}" value="${v.perKg}" style="width:120px;padding:8px 12px;font-size:13px">
+    </div>
+  `).join('');
+
+  const destLabels = {DXB:'Dubai',LHR:'London',JFK:'New York',FRA:'Frankfurt',SIN:'Singapore',HKG:'Hong Kong',SYD:'Sydney',NRT:'Tokyo',CDG:'Paris',LAX:'Los Angeles',GRU:'São Paulo',JNB:'Johannesburg'};
+  document.getElementById('destFields').innerHTML = Object.entries(cfg.destinations).map(([k,v])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <label style="font-size:13px;font-weight:600;color:var(--text);min-width:120px">${destLabels[k]||k}</label>
+      <input type="number" id="dest_${k}" value="${v}" step="0.05" style="width:100px;padding:8px 12px;font-size:13px">
+    </div>
+  `).join('');
+
+  document.getElementById('surchargeFields').innerHTML = Object.entries(cfg.surcharges).map(([k,v])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <label style="font-size:13px;font-weight:600;color:var(--text);min-width:120px">${k.charAt(0).toUpperCase()+k.slice(1)}</label>
+      <input type="number" id="sur_${k}" value="${v}" step="0.05" style="width:100px;padding:8px 12px;font-size:13px">
+    </div>
+  `).join('');
+}
+
+function saveRates() {
+  const cfg = DB.get('rateConfig');
+  Object.keys(cfg.services).forEach(k=>{
+    cfg.services[k].base = parseFloat(document.getElementById('rate_base_'+k)?.value)||cfg.services[k].base;
+    cfg.services[k].perKg = parseFloat(document.getElementById('rate_pkg_'+k)?.value)||cfg.services[k].perKg;
+  });
+  Object.keys(cfg.destinations).forEach(k=>{
+    cfg.destinations[k] = parseFloat(document.getElementById('dest_'+k)?.value)||cfg.destinations[k];
+  });
+  Object.keys(cfg.surcharges).forEach(k=>{
+    cfg.surcharges[k] = parseFloat(document.getElementById('sur_'+k)?.value)||cfg.surcharges[k];
+  });
+  DB.set('rateConfig',cfg);
+  showToast('✅','Rate configuration saved!');
+}
+
+// ============================================
+// UTILS
+// ============================================
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(icon, msg) {
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function formatDate(iso) {
+  if(!iso) return '—';
+  return new Date(iso).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.classList.remove('open'); });
+});
+
+initDefaults();
+</script>
+</body>
+</html>

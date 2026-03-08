@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Blog | AGC Global Express</title>
+  <meta name="description" id="pageDesc" content="Insights, news and guides on international freight, logistics, customs clearance and global trade from AGC Global Express.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" id="pageCanonical" href="https://www.agcglobalexpress.com/blog.html">
+  <meta property="og:type" content="article">
+
+  <!-- Blog Article Schema (dynamically injected) -->
+  <script id="articleSchema" type="application/ld+json"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+<body>
+
+<!-- ─── TOPBAR ─── -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-left">
+      <span>📞 +91-98765-43210</span>
+      <span>✉️ info@agcglobalexpress.com</span>
+    </div>
+    <div class="topbar-right">
+      <a href="/">Home</a>
+      <a href="/admin" target="_blank">Agent Login</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <a href="/" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M5 20L20 5L35 20L20 35Z" fill="#E63B2E" opacity="0.9"/><path d="M12 20L20 12L28 20L20 28Z" fill="#fff"/><circle cx="20" cy="20" r="4" fill="#E63B2E"/></svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-main">AGC</span>
+        <span class="logo-sub">GLOBAL EXPRESS</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/#services">Services</a></li>
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#rates">Rate Calculator</a></li>
+      <li><a href="/blog.html" class="active">Blog</a></li>
+      <li><a href="/#contact" class="btn-nav">Get Quote</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- ─── BLOG LIST VIEW ─── -->
+<div id="blogListView">
+  <div class="blog-hero">
+    <div class="container">
+      <div class="section-tag">Knowledge Hub</div>
+      <h1>Logistics <span class="accent">Insights & News</span></h1>
+      <p>Expert articles on freight, customs, global trade, and supply chain management</p>
+    </div>
+  </div>
+  <div class="container blog-layout">
+    <div class="blog-main">
+      <div id="blogGrid" class="blog-grid-full">
+        <div class="blog-loading">Loading articles...</div>
+      </div>
+    </div>
+    <aside class="blog-sidebar">
+      <div class="sidebar-widget">
+        <h4>Quick Links</h4>
+        <ul class="sidebar-links">
+          <li><a href="/#contact">Get a Free Quote →</a></li>
+          <li><a href="/#rates">Rate Calculator →</a></li>
+          <li><a href="/#services">Our Services →</a></li>
+          <li><a href="/#about">About AGC →</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-widget sidebar-cta">
+        <h4>Need Freight Help?</h4>
+        <p>Get a personalized quote within 2 hours</p>
+        <a href="/#contact" class="btn-primary btn-full">Request Quote</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ─── SINGLE POST VIEW ─── -->
+<div id="singlePostView" style="display:none">
+  <div class="container post-layout">
+    <article class="post-article" id="postContent">
+      <div class="post-loading">Loading article...</div>
+    </article>
+    <aside class="blog-sidebar">
+      <div class="sidebar-widget">
+        <h4>More Articles</h4>
+        <div id="relatedPosts"></div>
+      </div>
+      <div class="sidebar-widget sidebar-cta">
+        <h4>Ready to Ship?</h4>
+        <p>Get an instant rate estimate now</p>
+        <a href="/#rates" class="btn-primary btn-full">Calculate Rates</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <span>© 2024 AGC Global Express Pvt. Ltd. All rights reserved.</span>
+      <a href="/" style="color:rgba(255,255,255,0.5)">← Back to Home</a>
+    </div>
+  </div>
+</footer>
+
+<div class="whatsapp-float"><a href="https://wa.me/919876543210" target="_blank">💬</a></div>
+
+<script>
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 50);
+});
+document.getElementById('hamburger')?.addEventListener('click', () => {
+  document.getElementById('navLinks')?.classList.toggle('open');
+});
+
+const slug = new URLSearchParams(location.search).get('slug');
+
+if (slug) {
+  document.getElementById('blogListView').style.display = 'none';
+  document.getElementById('singlePostView').style.display = 'block';
+  loadPost(slug);
+} else {
+  loadBlogList();
+}
+
+async function loadBlogList() {
+  try {
+    const res = await fetch('/api/blogs');
+    const blogs = await res.json();
+    const grid = document.getElementById('blogGrid');
+    if (!blogs.length) { grid.innerHTML = '<p class="blog-loading">No articles published yet. Check back soon!</p>'; return; }
+    grid.innerHTML = blogs.map(b => `
+      <a href="/blog.html?slug=${b.slug}" class="blog-card-full">
+        <div class="bcf-img">
+          ${b.image ? `<img src="${b.image}" alt="${b.title}" loading="lazy">` : '<span>✈</span>'}
+        </div>
+        <div class="bcf-body">
+          <div class="bcf-meta">
+            <span class="bcf-tag">${b.tags?.split(',')[0]?.trim() || 'Logistics'}</span>
+            <span>${new Date(b.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          </div>
+          <h2>${b.title}</h2>
+          <p>${b.excerpt || ''}</p>
+          <div class="bcf-footer">
+            <span>By ${b.author}</span>
+            <span class="read-more">Read Article →</span>
+          </div>
+        </div>
+      </a>`).join('');
+  } catch { document.getElementById('blogGrid').innerHTML = '<p class="blog-loading">Failed to load articles.</p>'; }
+}
+
+async function loadPost(slug) {
+  const container = document.getElementById('postContent');
+  try {
+    const [res, relRes] = await Promise.all([fetch(`/api/blogs/${slug}`), fetch('/api/blogs')]);
+    const post = await res.json();
+    if (!res.ok) throw new Error('Not found');
+    const related = (await relRes.json()).filter(b => b.slug !== slug).slice(0, 4);
+
+    // SEO
+    document.getElementById('pageTitle').textContent = `${post.metaTitle || post.title} | AGC Global Express`;
+    document.getElementById('pageDesc').setAttribute('content', post.metaDesc || post.excerpt || '');
+    document.getElementById('pageCanonical').setAttribute('href', `https://www.agcglobalexpress.com/blog.html?slug=${slug}`);
+
+    // Article schema
+    document.getElementById('articleSchema').textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": post.title,
+      "description": post.metaDesc || post.excerpt,
+      "author": { "@type": "Person", "name": post.author },
+      "publisher": { "@type": "Organization", "name": "AGC Global Express" },
+      "datePublished": post.createdAt,
+      "dateModified": post.updatedAt,
+      "image": post.image || ""
+    });
+
+    container.innerHTML = `
+      <a href="/blog.html" class="back-link">← All Articles</a>
+      ${post.image ? `<div class="post-hero-img"><img src="${post.image}" alt="${post.title}"></div>` : ''}
+      <div class="post-header">
+        <div class="post-tags">${(post.tags || 'Logistics').split(',').map(t => `<span class="post-tag">${t.trim()}</span>`).join('')}</div>
+        <h1>${post.title}</h1>
+        <div class="post-meta">
+          <span>By <strong>${post.author}</strong></span>
+          <span>${new Date(post.createdAt).toLocaleDateString('en-IN', { dateStyle: 'long' })}</span>
+        </div>
+      </div>
+      <div class="post-body">${renderMarkdown(post.content)}</div>
+      <div class="post-share">
+        <strong>Share this article:</strong>
+        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(post.title)}" target="_blank" class="share-btn">𝕏 Twitter</a>
+        <a href="https://www.linkedin.com/shareArticle?url=${encodeURIComponent(location.href)}" target="_blank" class="share-btn">in LinkedIn</a>
+        <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);this.textContent='Copied!'">🔗 Copy Link</button>
+      </div>`;
+
+    document.getElementById('relatedPosts').innerHTML = related.map(b => `
+      <a href="/blog.html?slug=${b.slug}" class="related-post">
+        <span>${b.title}</span>
+        <small>${new Date(b.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</small>
+      </a>`).join('') || '<p style="color:#718096;font-size:.85rem">No other articles yet.</p>';
+
+  } catch { container.innerHTML = '<div class="post-loading">Article not found. <a href="/blog.html">← Back to Blog</a></div>'; }
+}
+
+// Simple markdown renderer
+function renderMarkdown(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[hHuUlLoO])(.+)$/gm, (m) => m.startsWith('<') ? m : `<p>${m}</p>`)
+    .trim();
+}
+</script>
+</body>
+</html>
