@@ -186,13 +186,43 @@
       <svg viewBox="0 0 40 40" fill="none"><path d="M5 20L20 5L35 20L20 35Z" fill="#E63B2E" opacity=".9"/><path d="M12 20L20 12L28 20L20 28Z" fill="#fff"/><circle cx="20" cy="20" r="4" fill="#E63B2E"/></svg>
       <div class="login-logo-text"><span class="lm">AGC</span><span class="ls">Global Express</span></div>
     </div>
-    <div class="login-card">
+    <!-- LOGIN -->
+    <div class="login-card" id="loginCard">
       <h2>Admin Portal</h2>
       <p>Sign in to manage queries, rates, and content</p>
       <div class="login-err" id="loginErr"></div>
+      <div id="lockoutBar" style="background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;padding:.6rem 1rem;border-radius:8px;font-size:.82rem;margin-bottom:.75rem;display:none;text-align:center"></div>
       <div class="lf-group"><label>Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
-      <div class="lf-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="lf-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
       <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In →</button>
+      <button onclick="showForgotForm()" style="width:100%;margin-top:.6rem;padding:.5rem;background:none;border:none;cursor:pointer;font-size:.82rem;color:#64748b;text-decoration:underline">Forgot password?</button>
+    </div>
+    <!-- FORGOT PASSWORD -->
+    <div class="login-card" id="forgotCard" style="display:none">
+      <h2>Forgot Password</h2>
+      <p>Enter your registered email — we will send a reset link</p>
+      <div class="login-err" id="forgotErr"></div>
+      <div id="forgotOk" style="background:#D1FAE5;color:#065F46;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;display:none"></div>
+      <div class="lf-group"><label>Email Address</label><input type="email" id="forgotEmail" placeholder="your@email.com"></div>
+      <button class="btn-login" id="forgotBtn" onclick="doForgot()">Send Reset Link</button>
+      <button onclick="showLoginForm()" style="width:100%;margin-top:.6rem;padding:.5rem;background:none;border:none;cursor:pointer;font-size:.82rem;color:#64748b;text-decoration:underline">Back to Login</button>
+    </div>
+    <!-- RESET PASSWORD -->
+    <div class="login-card" id="resetCard" style="display:none">
+      <h2>Set New Password</h2>
+      <p>Choose a strong new password for your account</p>
+      <div class="login-err" id="resetErr"></div>
+      <div id="resetOk" style="background:#D1FAE5;color:#065F46;padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;display:none"></div>
+      <div class="lf-group">
+        <label>New Password</label>
+        <input type="password" id="resetPass" placeholder="Min 6 characters" oninput="checkPwStrength(this,'resetBar')">
+        <div id="resetBar" style="height:4px;border-radius:2px;margin-top:.4rem;background:#e2e8f0;transition:all .3s"></div>
+      </div>
+      <div class="lf-group"><label>Confirm New Password</label><input type="password" id="resetConfirm" placeholder="Repeat password"></div>
+      <button class="btn-login" id="resetBtn" onclick="doReset()">Reset Password</button>
     </div>
   </div>
 </div>
@@ -219,6 +249,8 @@
       <div class="nav-section superadmin-only">Settings</div>
       <button class="nav-item superadmin-only" onclick="showView('rates')" id="nav-rates"><span class="nav-icon">💰</span>Rate Manager</button>
       <button class="nav-item superadmin-only" onclick="showView('users')" id="nav-users"><span class="nav-icon">👥</span>Users & Agents</button>
+      <div class="nav-section">Account</div>
+      <button class="nav-item" onclick="showView('changepass')" id="nav-changepass"><span class="nav-icon">🔒</span>Change Password</button>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -322,6 +354,38 @@
             <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
             <tbody id="usersTableBody"></tbody>
           </table></div>
+        </div>
+      </div>
+
+      <!-- CHANGE PASSWORD -->
+      <div class="view" id="view-changepass">
+        <div class="page-title">Change Password</div>
+        <div class="page-desc">Update your account password</div>
+        <div style="max-width:440px">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Set New Password</span></div>
+            <div style="padding:1.5rem">
+              <div id="cpAlert" style="display:none;margin-bottom:1rem"></div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label class="form-group" style="font-size:.8rem;font-weight:600;color:#2D3748;margin-bottom:.4rem;display:block">Current Password</label>
+                <input class="form-control" type="password" id="cpCurrent" placeholder="Your current password">
+              </div>
+              <div class="form-group" style="margin-bottom:.5rem">
+                <label style="font-size:.8rem;font-weight:600;color:#2D3748;margin-bottom:.4rem;display:block">New Password</label>
+                <input class="form-control" type="password" id="cpNew" placeholder="Min 6 characters" oninput="checkPwStrength(this,'cpBar')">
+                <div id="cpBar" style="height:4px;border-radius:2px;margin-top:.4rem;background:#e2e8f0;transition:all .3s"></div>
+              </div>
+              <div class="form-group" style="margin-bottom:1.5rem">
+                <label style="font-size:.8rem;font-weight:600;color:#2D3748;margin-bottom:.4rem;display:block">Confirm New Password</label>
+                <input class="form-control" type="password" id="cpConfirm" placeholder="Repeat new password">
+              </div>
+              <button class="btn btn-primary-sm" style="width:100%;justify-content:center;padding:.75rem" onclick="doChangePassword()">Update Password</button>
+            </div>
+          </div>
+          <div style="margin-top:1rem;padding:1rem;background:#F4F7FA;border-radius:10px;border:1px solid #E2E8F0">
+            <p style="font-size:.8rem;color:#64748b;margin:0"><strong>Password tips:</strong><br>
+            Use at least 8 characters with a mix of letters, numbers and symbols like <code>MyPass@2024</code></p>
+          </div>
         </div>
       </div>
 
@@ -844,7 +908,130 @@ function showToast(msg, type) {
   toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 3000);
 }
 
+// ─── NEW: FORGOT / RESET PASSWORD ─────────────────────────────────────────
+function showForgotForm() {
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('forgotCard').style.display = 'block';
+  document.getElementById('resetCard').style.display = 'none';
+}
+function showLoginForm() {
+  document.getElementById('loginCard').style.display = 'block';
+  document.getElementById('forgotCard').style.display = 'none';
+  document.getElementById('resetCard').style.display = 'none';
+}
+
+async function doForgot() {
+  const btn = document.getElementById('forgotBtn');
+  const err = document.getElementById('forgotErr');
+  const ok  = document.getElementById('forgotOk');
+  err.style.display = 'none'; ok.style.display = 'none';
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) { err.textContent = 'Please enter your email'; err.style.display = 'block'; return; }
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/auth/forgot-password', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    ok.textContent = data.message || 'Reset link sent! Check your inbox.';
+    ok.style.display = 'block';
+  } catch(e) { err.textContent = 'Error sending reset link. Try again.'; err.style.display = 'block'; }
+  finally { btn.textContent = 'Send Reset Link'; btn.disabled = false; }
+}
+
+async function doReset() {
+  const btn = document.getElementById('resetBtn');
+  const err = document.getElementById('resetErr');
+  const ok  = document.getElementById('resetOk');
+  err.style.display = 'none'; ok.style.display = 'none';
+  const pass = document.getElementById('resetPass').value;
+  const conf = document.getElementById('resetConfirm').value;
+  if (!pass || pass.length < 6) { err.textContent = 'Password must be at least 6 characters'; err.style.display = 'block'; return; }
+  if (pass !== conf) { err.textContent = 'Passwords do not match'; err.style.display = 'block'; return; }
+  const resetToken = new URLSearchParams(location.search).get('reset');
+  if (!resetToken) { err.textContent = 'Invalid reset link'; err.style.display = 'block'; return; }
+  btn.textContent = 'Resetting...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/auth/reset-password', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ token: resetToken, password: pass })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    ok.textContent = data.message + ' Redirecting to login...';
+    ok.style.display = 'block';
+    setTimeout(() => { history.replaceState(null,'','/admin'); showLoginForm(); }, 2500);
+  } catch(e) { err.textContent = e.message; err.style.display = 'block'; }
+  finally { btn.textContent = 'Reset Password'; btn.disabled = false; }
+}
+
+// Check if page loaded with ?reset= token
+function checkResetToken() {
+  const t = new URLSearchParams(location.search).get('reset');
+  if (t && !token) {
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('forgotCard').style.display = 'none';
+    document.getElementById('resetCard').style.display = 'block';
+  }
+}
+
+// ─── NEW: CHANGE PASSWORD (inside admin) ───────────────────────────────────
+async function doChangePassword() {
+  const current = document.getElementById('cpCurrent').value;
+  const newPw   = document.getElementById('cpNew').value;
+  const confirm = document.getElementById('cpConfirm').value;
+  const alert   = document.getElementById('cpAlert');
+  alert.style.display = 'none';
+
+  if (!current || !newPw) {
+    alert.innerHTML = '<div style="background:#FEE2E2;color:#991B1B;padding:.75rem 1rem;border-radius:8px;font-size:.85rem">Please fill in all fields</div>';
+    alert.style.display = 'block'; return;
+  }
+  if (newPw.length < 6) {
+    alert.innerHTML = '<div style="background:#FEE2E2;color:#991B1B;padding:.75rem 1rem;border-radius:8px;font-size:.85rem">New password must be at least 6 characters</div>';
+    alert.style.display = 'block'; return;
+  }
+  if (newPw !== confirm) {
+    alert.innerHTML = '<div style="background:#FEE2E2;color:#991B1B;padding:.75rem 1rem;border-radius:8px;font-size:.85rem">New passwords do not match</div>';
+    alert.style.display = 'block'; return;
+  }
+  try {
+    await authFetch('/api/auth/change-password', 'POST', { currentPassword: current, newPassword: newPw });
+    alert.innerHTML = '<div style="background:#D1FAE5;color:#065F46;padding:.75rem 1rem;border-radius:8px;font-size:.85rem">✅ Password changed successfully! Please log in again.</div>';
+    alert.style.display = 'block';
+    ['cpCurrent','cpNew','cpConfirm'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('cpBar').style.width = '0';
+    setTimeout(() => doLogout(), 2000);
+  } catch(e) {
+    alert.innerHTML = '<div style="background:#FEE2E2;color:#991B1B;padding:.75rem 1rem;border-radius:8px;font-size:.85rem">' + e.message + '</div>';
+    alert.style.display = 'block';
+  }
+}
+
+// ─── NEW: Password strength meter ──────────────────────────────────────────
+function checkPwStrength(input, barId) {
+  const val = input.value;
+  const bar = document.getElementById(barId);
+  if (!bar) return;
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const configs = [
+    {w:'0%', bg:'#e2e8f0'},
+    {w:'33%', bg:'#EF4444'},
+    {w:'55%', bg:'#F59E0B'},
+    {w:'80%', bg:'#3B82F6'},
+    {w:'100%', bg:'#10B981'}
+  ];
+  const c = configs[Math.min(score, 4)];
+  bar.style.width = c.w; bar.style.background = c.bg;
+}
+
 init();
+checkResetToken();
 </script>
 </body>
 </html>
