@@ -1,0 +1,11 @@
+[
+  {
+    "id": "admin-1",
+    "username": "admin",
+    "password": "759dd4b197efe7095e4527a6aaaf0bcb484556b594a7c17d7dc5236691c1daa5",
+    "role": "superadmin",
+    "name": "Super Admin",
+    "email": "admin@agcglobalexpress.com",
+    "createdAt": "2026-03-08T15:19:19.820Z"
+  }
+]

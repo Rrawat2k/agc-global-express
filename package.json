@@ -1,0 +1,15 @@
+{
+  "name": "agc-global-express",
+  "version": "1.0.0",
+  "description": "AGC Global Express - Freight & Logistics Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": ["freight", "logistics", "shipping"],
+  "author": "AGC Global Express",
+  "license": "UNLICENSED"
+}

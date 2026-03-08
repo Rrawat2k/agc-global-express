@@ -1,0 +1,92 @@
+[
+  {
+    "id": "r1",
+    "origin": "Delhi",
+    "destination": "Mumbai",
+    "service": "Express",
+    "perKg": 80,
+    "perBag": 150,
+    "minWeight": 1
+  },
+  {
+    "id": "r2",
+    "origin": "Delhi",
+    "destination": "Mumbai",
+    "service": "Standard",
+    "perKg": 50,
+    "perBag": 100,
+    "minWeight": 1
+  },
+  {
+    "id": "r3",
+    "origin": "Delhi",
+    "destination": "Bangalore",
+    "service": "Express",
+    "perKg": 90,
+    "perBag": 160,
+    "minWeight": 1
+  },
+  {
+    "id": "r4",
+    "origin": "Delhi",
+    "destination": "Chennai",
+    "service": "Express",
+    "perKg": 95,
+    "perBag": 170,
+    "minWeight": 1
+  },
+  {
+    "id": "r5",
+    "origin": "Mumbai",
+    "destination": "Delhi",
+    "service": "Express",
+    "perKg": 80,
+    "perBag": 150,
+    "minWeight": 1
+  },
+  {
+    "id": "r6",
+    "origin": "Mumbai",
+    "destination": "Bangalore",
+    "service": "Express",
+    "perKg": 70,
+    "perBag": 130,
+    "minWeight": 1
+  },
+  {
+    "id": "r7",
+    "origin": "Delhi",
+    "destination": "London",
+    "service": "Air Freight",
+    "perKg": 850,
+    "perBag": 1200,
+    "minWeight": 5
+  },
+  {
+    "id": "r8",
+    "origin": "Delhi",
+    "destination": "Dubai",
+    "service": "Air Freight",
+    "perKg": 450,
+    "perBag": 800,
+    "minWeight": 5
+  },
+  {
+    "id": "r9",
+    "origin": "Mumbai",
+    "destination": "USA",
+    "service": "Air Freight",
+    "perKg": 950,
+    "perBag": 1500,
+    "minWeight": 5
+  },
+  {
+    "id": "r10",
+    "origin": "Delhi",
+    "destination": "Singapore",
+    "service": "Air Freight",
+    "perKg": 600,
+    "perBag": 1000,
+    "minWeight": 5
+  }
+]
